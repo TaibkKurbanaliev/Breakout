@@ -5,6 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     [SerializeField] private float _speed = 4.0f;
+    [SerializeField] private PlatformSpawner _spawner;
     [field:SerializeField] public int Score {  get; private set; }
     [field: SerializeField] public int NumberOfLives { get; private set; } = 3;
 
@@ -18,6 +19,16 @@ public class Player : MonoBehaviour
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
+    }
+
+    private void OnEnable()
+    {
+        _spawner.PlatformDestroyed += OnPlatformDestroyed;
+    }
+
+    private void OnDisable()
+    {
+        _spawner.PlatformDestroyed -= OnPlatformDestroyed;
     }
 
     // Update is called once per frame
@@ -43,5 +54,11 @@ public class Player : MonoBehaviour
 
         NumberOfLives--;
         LivesChanged?.Invoke();
+    }
+    
+    private void OnPlatformDestroyed(int points)
+    {
+        Score += points;
+        ScoreChanged?.Invoke();
     }
 }

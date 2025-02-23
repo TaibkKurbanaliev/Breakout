@@ -37,6 +37,11 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision.gameObject.TryGetComponent(out Platform platform))
+        {
+            platform.Hit();
+        }
+
         if ((1 << collision.gameObject.layer & _playerMask) != 0)
         {
             _targetDir = Vector2.Reflect(_targetDir, collision.relativeVelocity).normalized;
