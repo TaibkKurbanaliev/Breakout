@@ -5,7 +5,9 @@ using UnityEngine;
 public class Ball : MonoBehaviour
 {
     [SerializeField] private float _speed;
+    [SerializeField] private float _speedIncrease = 0.1f;
     [SerializeField] private LayerMask _playerMask;
+    [SerializeField] private AudioSource _audio;
 
     private Rigidbody2D _rb;
     private Vector2 _targetDir = Vector2.down;
@@ -14,11 +16,20 @@ public class Ball : MonoBehaviour
 
     public event Action Died;
 
-
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _player = FindAnyObjectByType<Player>();
+    }
+
+    private void OnEnable()
+    {
+        _player.ScoreChanged += IncreaseSpeed;
+    }
+
+    private void OnDisable()
+    {
+        _player.ScoreChanged -= IncreaseSpeed;
     }
 
     public void FixedUpdate()
@@ -37,6 +48,8 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        _audio.Play();
+
         if (collision.gameObject.TryGetComponent(out Platform platform))
         {
             platform.Hit();
@@ -63,4 +76,11 @@ public class Ball : MonoBehaviour
     {
         _isMoving = true;
     }
+
+    public void IncreaseSpeed()
+    {
+        _speed += _speedIncrease;
+    }
+
+
 }

@@ -4,6 +4,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour
 {
+    private const string HighScoreKey = "HighScore";
+
     [SerializeField] private float _speed = 4.0f;
     [SerializeField] private PlatformSpawner _spawner;
     [field:SerializeField] public int Score {  get; private set; }
@@ -47,13 +49,27 @@ public class Player : MonoBehaviour
 
     public void DecreaseLive()
     {
-        if (IsDied)
-        {
-            return;
-        }
-
         NumberOfLives--;
         LivesChanged?.Invoke();
+
+        if (IsDied)
+        {
+            if (PlayerPrefs.HasKey(HighScoreKey))
+            {
+                var previousHighScore = PlayerPrefs.GetInt(HighScoreKey);
+                if (previousHighScore < Score)
+                {
+                    PlayerPrefs.SetInt(HighScoreKey, Score);
+                }
+            }
+            else
+            {
+                PlayerPrefs.SetInt(HighScoreKey, Score);
+            }
+
+            PlayerPrefs.Save();
+            return;
+        }
     }
     
     private void OnPlatformDestroyed(int points)
